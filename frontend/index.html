@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homeopathy RAG - Remedy Search</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Background gradient -->
+    <div class="gradient-bg"></div>
+
+    <!-- Main container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" stroke="url(#gradient)" stroke-width="2" />
+                    <path d="M20 10 L20 30 M10 20 L30 20" stroke="url(#gradient)" stroke-width="2"
+                        stroke-linecap="round" />
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6366f1" />
+                            <stop offset="100%" style="stop-color:#ec4899" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1>Homeopathy RAG</h1>
+            </div>
+            <div class="stats" id="stats">
+                <span class="stat-badge">
+                    <span class="stat-label">Remedies:</span>
+                    <span class="stat-value" id="totalRemedies">---</span>
+                </span>
+                <span class="stat-badge">
+                    <span class="stat-label">Status:</span>
+                    <span class="stat-value status-indicator" id="status">
+                        <span class="status-dot"></span>
+                        Loading
+                    </span>
+                </span>
+            </div>
+        </header>
+
+        <!-- Hero section -->
+        <section class="hero">
+            <h2 class="hero-title">Find the Perfect Remedy</h2>
+            <p class="hero-subtitle">Search through 688 homeopathy remedies using AI-powered semantic search</p>
+        </section>
+
+        <!-- Search section -->
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input"
+                        placeholder="Describe symptoms... (e.g., headache with nausea)" autocomplete="off" />
+                    <button id="searchButton" class="search-button">
+                        <span class="button-text">Search</span>
+                        <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="search-suggestions">
+                    <span class="suggestion-label">Try:</span>
+                    <button class="suggestion-chip" data-query="anxiety and fear">Anxiety & Fear</button>
+                    <button class="suggestion-chip" data-query="stomach pain after eating">Stomach Pain</button>
+                    <button class="suggestion-chip" data-query="insomnia and restlessness">Insomnia</button>
+                    <button class="suggestion-chip" data-query="fever with chills">Fever</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Answer section -->
+        <section class="answer-section" id="answerSection" style="display: none;">
+            <div class="answer-box">
+                <div class="answer-header">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 2a10 10 0 1 0 10 10H12V2z"></path>
+                        <path d="M12 12 2.1 12.1"></path>
+                        <path d="M12 12 14.8 2.1"></path>
+                    </svg>
+                    AI Assistant
+                </div>
+                <div id="answerText"></div>
+            </div>
+        </section>
+
+        <!-- Results section -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h3 class="results-title">Search Results</h3>
+                <span class="results-meta" id="resultsMeta">
+                    <span id="resultsCount">0</span> remedies found in <span id="queryTime">0</span>ms
+                </span>
+            </div>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be inserted here -->
+            </div>
+        </section>
+
+        <!-- Loading state -->
+        <div class="loading-state" id="loadingState" style="display: none;">
+            <div class="spinner"></div>
+            <p>Searching remedies...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                <circle cx="60" cy="60" r="50" stroke="url(#emptyGradient)" stroke-width="2" opacity="0.3" />
+                <path d="M60 30 L60 90 M30 60 L90 60" stroke="url(#emptyGradient)" stroke-width="2"
+                    stroke-linecap="round" opacity="0.5" />
+                <defs>
+                    <linearGradient id="emptyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6366f1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h3>Start Your Search</h3>
+            <p>Enter symptoms or conditions to find relevant homeopathy remedies</p>
+        </div>
+
+        <!-- Error state -->
+        <div class="error-state" id="errorState" style="display: none;">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ef4444">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <h3>Oops! Something went wrong</h3>
+            <p id="errorMessage">Please try again or check your connection</p>
+            <button class="retry-button" onclick="location.reload()">Retry</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Powered by <strong>FAISS Vector Database</strong> & <strong>FastAPI</strong></p>
+        <p class="footer-note">688 remedies from Boericke's Materia Medica</p>
+    </footer>
+
+    <script src="app.js?v=2"></script>
+</body>
+
+</html>
